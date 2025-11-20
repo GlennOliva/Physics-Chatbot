@@ -2,8 +2,8 @@ import streamlit as st
 import os
 import asyncio
 
-from langchain.prompts import PromptTemplate
-from langchain.memory import ConversationBufferMemory
+from langchain_core.prompts import PromptTemplate
+from langchain_community.memory import ConversationBufferMemory
 from langchain_community.vectorstores import Chroma
 from langchain_community.embeddings.ollama import OllamaEmbeddings
 from langchain_community.llms import Ollama
@@ -11,7 +11,9 @@ from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
 from langchain.callbacks.manager import CallbackManager
 from langchain_community.document_loaders import PyPDFLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
-from langchain.chains import RetrievalQA
+#from langchain.chains import RetrievalQA
+from langchain.chains.combine_documents import create_stuff_documents_chain
+from langchain.chains import create_retrieval_chain
 
 
 
