@@ -13,9 +13,10 @@ from langchain.schema import HumanMessage, AIMessage                        # �
 
 from langchain_community.document_loaders import PyPDFLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
-from langchain_chains.combine_documents import create_stuff_documents_chain
-from langchain_chains import create_retrieval_chain
-from langchain_core.pydantic_v1 import Field
+from langchain.chains.combine_documents import create_stuff_documents_chain
+from langchain.chains import create_retrieval_chain
+
+
 
 
 
@@ -29,7 +30,7 @@ os.makedirs("vectorDB", exist_ok=True)
 # ---------------------------
 # API Key
 # ---------------------------
-GEMINI_API_KEY = st.secrets["AIzaSyCmJMX_NxAeOsAtXPsZVaePJysKTiFROdY"]   # ⭐ Fix: "st.secrets" must be dict key only
+GEMINI_API_KEY = st.secrets["GEMINI_API_KEY"]   # ⭐ Fix: "st.secrets" must be dict key only
 
 
 # ---------------------------
