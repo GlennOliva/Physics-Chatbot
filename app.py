@@ -3,7 +3,7 @@ import os
 import asyncio
 
 from langchain_core.prompts import PromptTemplate
-from langchain.memory import ConversationBufferMemory   
+from langchain_community.memory import ConversationBufferMemory
 
 from langchain_community.vectorstores import Chroma
 from langchain_google_genai import GoogleGenerativeAIEmbeddings
