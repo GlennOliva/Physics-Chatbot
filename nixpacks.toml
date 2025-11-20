@@ -1,0 +1,16 @@
+[phases.setup]
+nixPkgs = ["python311", "ollama"]
+
+[phases.install]
+cmds = [
+  "pip install --upgrade pip",
+  "pip install -r requirements.txt"
+]
+
+[phases.build]
+cmds = [
+  "ollama pull llama3.1"
+]
+
+[start]
+cmd = "ollama serve & sleep 5 && streamlit run emne.py --server.port=8501 --server.address=0.0.0.0"
