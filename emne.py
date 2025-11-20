@@ -1,6 +1,7 @@
 import streamlit as st
 import os
 import asyncio
+
 from langchain.prompts import PromptTemplate
 from langchain.memory import ConversationBufferMemory
 from langchain_community.vectorstores import Chroma
@@ -9,8 +10,9 @@ from langchain_community.llms import Ollama
 from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
 from langchain.callbacks.manager import CallbackManager
 from langchain_community.document_loaders import PyPDFLoader
-from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain.chains import RetrievalQA
+
 
 # Ensure necessary directories
 os.makedirs('pdfFiles', exist_ok=True)
@@ -103,7 +105,7 @@ if 'qa_chain' not in st.session_state:
     )
 
 # Set up Streamlit interface
-st.title("PhyChat: A Physics Book-Based Chatbot")
+st.title("PhyChat: A Physics Chatbot")
 
 # Show only the last 5 messages for a cleaner chat interface
 for message in st.session_state.chat_history[-5:]:
