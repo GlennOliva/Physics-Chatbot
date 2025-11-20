@@ -15,6 +15,7 @@ from langchain_community.document_loaders import PyPDFLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_chains.combine_documents import create_stuff_documents_chain
 from langchain_chains import create_retrieval_chain
+from langchain_core.pydantic_v1 import Field
 
 
 
