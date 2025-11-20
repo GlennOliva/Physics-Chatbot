@@ -3,7 +3,7 @@ import os
 import asyncio
 
 from langchain_core.prompts import PromptTemplate
-from langchain.memory import ConversationBufferMemory
+from langchain_core.memory import ConversationBufferMemory
 from langchain_community.vectorstores import Chroma
 from langchain_community.embeddings.ollama import OllamaEmbeddings
 from langchain_community.llms import Ollama
@@ -12,6 +12,7 @@ from langchain.callbacks.manager import CallbackManager
 from langchain_community.document_loaders import PyPDFLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain.chains import RetrievalQA
+
 
 
 # Ensure necessary directories
