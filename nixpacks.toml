@@ -3,13 +3,9 @@ nixPkgs = ["python311", "ollama"]
 
 [phases.install]
 cmds = [
-  "pip install --upgrade pip",
-  "pip install -r requirements.txt"
-]
-
-[phases.build]
-cmds = [
-  "ollama pull llama3.1"
+  "python3 -m ensurepip",
+  "python3 -m pip install --upgrade pip",
+  "python3 -m pip install -r requirements.txt"
 ]
 
 [start]
