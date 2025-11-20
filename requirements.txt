@@ -1,25 +1,11 @@
 streamlit>=1.25.0
-
-# LangChain ecosystem
 langchain>=0.1.20
 langchain-core>=0.1.20
 langchain-community>=0.0.38
 langchain-text-splitters>=0.0.1
-
-# Vector DB
 chromadb>=0.4.24
-
-# PDF loader
 pypdf>=3.8.0
-
-# Embeddings and LLM
 ollama>=0.1.9
-
-# Tokenizer
 tiktoken>=0.6.0
-
-# Environment variables
 python-dotenv>=1.0.1
-
-# Optional but useful for embeddings
 sentence-transformers>=2.2.2
