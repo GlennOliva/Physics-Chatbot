@@ -1,11 +1,11 @@
 [phases.setup]
-nixPkgs = ["python311", "ollama"]
+# DON'T specify python here — let Nixpacks auto-detect Python
+nixPkgs = ["ollama"] 
 
 [phases.install]
 cmds = [
-  "python3 -m ensurepip",
-  "python3 -m pip install --upgrade pip",
-  "python3 -m pip install -r requirements.txt"
+  "pip install --upgrade pip",
+  "pip install -r requirements.txt"
 ]
 
 [start]
