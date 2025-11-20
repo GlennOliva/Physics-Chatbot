@@ -2,7 +2,7 @@ import streamlit as st
 import os
 import asyncio
 
-from langchain.prompts import PromptTemplate
+from langchain_core.prompts import PromptTemplate
 from langchain.memory import ConversationBufferMemory
 from langchain_community.vectorstores import Chroma
 from langchain_community.embeddings.ollama import OllamaEmbeddings
@@ -139,4 +139,5 @@ async def get_response(user_input):
 
 # Process user input
 if user_input := st.chat_input("Ask a question about the textbook:", key="user_input"):
+
     asyncio.run(get_response(user_input))  # Run async response handling
