@@ -10,7 +10,7 @@ RUN apt update && \
 WORKDIR /app
 
 # Copy files
-COPY app.py /app/
+COPY emne.py /app/
 COPY style.css /app/
 COPY phybook10.pdf /app/
 COPY requirements.txt /app/
