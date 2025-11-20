@@ -3,11 +3,13 @@ import os
 import asyncio
 
 from langchain_core.prompts import PromptTemplate
-from langchain_community.chat_message_histories import ChatMessageHistory
+from langchain_community.chat_message_histories import ChatMessageHistory   # ⭐ Added
 
 from langchain_community.vectorstores import Chroma
 from langchain_google_genai import GoogleGenerativeAIEmbeddings
 from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain.schema.runnable import RunnableWithMessageHistory            # ⭐ Added
+from langchain.schema import HumanMessage, AIMessage                        # ⭐ Added
 
 from langchain_community.document_loaders import PyPDFLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
@@ -26,14 +28,20 @@ os.makedirs("vectorDB", exist_ok=True)
 # ---------------------------
 # API Key
 # ---------------------------
-GEMINI_API_KEY = st.secrets["AIzaSyCmJMX_NxAeOsAtXPsZVaePJysKTiFROdY"]
+GEMINI_API_KEY = st.secrets["AIzaSyCmJMX_NxAeOsAtXPsZVaePJysKTiFROdY"]   # ⭐ Fix: "st.secrets" must be dict key only
 
 
 # ---------------------------
 # Session state
 # ---------------------------
 if "chat_history" not in st.session_state:
-    st.session_state.chat_history = []
+    st.session_state.chat_history = []      # For UI only
+
+# ⭐ Added — tracks LLM conversation memory separately
+if "message_history" not in st.session_state:
+    st.session_state.message_history = ChatMessageHistory()
+
+
 
 if "prompt" not in st.session_state:
     template = """
@@ -57,6 +65,7 @@ Assistant:
     )
 
 
+
 # ---------------------------
 # Load PDF + Vector Store
 # ---------------------------
@@ -73,7 +82,6 @@ if "vectorstore" not in st.session_state:
     )
     chunks = splitter.split_documents(documents)
 
-    # --- Cloud Embeddings (Gemini) ---
     embedding_model = GoogleGenerativeAIEmbeddings(
         model="models/embedding-001",
         google_api_key=GEMINI_API_KEY
@@ -88,6 +96,7 @@ if "vectorstore" not in st.session_state:
     st.session_state.vectorstore.persist()
 
 
+
 # ---------------------------
 # Retriever
 # ---------------------------
@@ -95,6 +104,7 @@ st.session_state.retriever = st.session_state.vectorstore.as_retriever(
     search_type="mmr",
     search_kwargs={"k": 5}
 )
+
 
 
 # ---------------------------
@@ -106,6 +116,7 @@ if "llm" not in st.session_state:
         google_api_key=GEMINI_API_KEY,
         temperature=0.3
     )
+
 
 
 # ---------------------------
@@ -123,15 +134,31 @@ if "qa_chain" not in st.session_state:
     )
 
 
+
+# ---------------------------
+# ⭐ Build memory-powered chain
+# ---------------------------
+def get_session_history(session_id: str):
+    return st.session_state.message_history
+
+memory_chain = RunnableWithMessageHistory(
+    st.session_state.qa_chain,
+    get_session_history,
+    input_messages_key="input",        # ⭐ Very important
+    history_messages_key="history"     # ⭐ Matches prompt variable
+)
+
+
+
 # ---------------------------
 # UI
 # ---------------------------
 st.title("PhyChat – Physics Chatbot (PDF-Based)")
 
-
 for msg in st.session_state.chat_history[-5:]:
     with st.chat_message(msg["role"]):
         st.markdown(msg["message"])
+
 
 
 # ---------------------------
@@ -146,10 +173,15 @@ async def get_response(user_input):
     with st.chat_message("assistant"):
         with st.spinner("Thinking..."):
 
-            result = st.session_state.qa_chain.invoke({"input": user_input})
+            # ⭐ Memory-aware chain invoke
+            result = memory_chain.invoke(
+                {"input": user_input},
+                config={"configurable": {"session_id": "abc123"}}   # Can be per-user
+            )
+
             answer = result["answer"]
 
-        # fake typing effect
+        # Typing animation
         placeholder = st.empty()
         full = ""
         for w in answer.split():
@@ -160,6 +192,7 @@ async def get_response(user_input):
         placeholder.markdown(full)
 
     st.session_state.chat_history.append({"role": "assistant", "message": answer})
+
 
 
 # ---------------------------
