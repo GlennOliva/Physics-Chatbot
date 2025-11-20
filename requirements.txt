@@ -1,25 +1,11 @@
-# ---------------------------------------------
-# Streamlit + LangChain + Gemini (Python 3.12)
-# Clean, Stable, No Conflicts
-# ---------------------------------------------
-
-streamlit==1.37.0
-
-# LangChain ecosystem (Python 3.12 approved versions)
-langchain==0.2.11
-langchain-core==0.2.26
-langchain-community==0.2.4
-langchain-text-splitters==0.2.2
-
-# Google Gemini official + LangChain integration
-google-generativeai==0.5.2
-langchain-google-genai==1.0.3
-
-# Vector database
-chromadb==0.5.3
-
-# PDF loader
-pypdf==4.2.0
-
-# Environment variables support
-python-dotenv==1.0.1
+streamlit
+langchain==0.2.12
+langchain-core==0.2.24
+langchain-community==0.2.7
+langchain-google-genai==0.3.2
+langchain-text-splitters==0.2.1
+google-generativeai>=0.7.0
+chromadb==0.4.24
+pypdf==4.3.1
+protobuf==4.25.3
+python-dotenv
