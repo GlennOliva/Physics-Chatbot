@@ -11,6 +11,7 @@ from langchain_google_genai import ChatGoogleGenerativeAI
 
 # CORRECT for langchain 0.1.20
 from langchain_core.runnables import RunnableWithMessageHistory
+
 from langchain_core.messages import HumanMessage, AIMessage
 
 from langchain_community.document_loaders import PyPDFLoader
