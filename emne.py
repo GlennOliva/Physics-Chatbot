@@ -86,7 +86,7 @@ st.session_state.retriever = st.session_state.vectorstore.as_retriever(
 # Initialize the LLM model with asynchronous response
 if 'llm' not in st.session_state:
     st.session_state.llm = Ollama(
-        base_url="http://127.0.0.1:11434",
+        base_url="http://localhost:11434",
         model="llama3.1",
         verbose=True,
         callback_manager=CallbackManager([StreamingStdOutCallbackHandler()]),

@@ -4,7 +4,3 @@ langchain_community
 chromadb
 pydantic-settings
 asyncio
-python-dotenv
-llama-index-core
-llama-index-llms-ollama
-llama-index-embeddings-huggingface
