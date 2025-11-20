@@ -3,7 +3,7 @@ import os
 import asyncio
 
 from langchain_core.prompts import PromptTemplate
-from langchain_community.memory import ConversationBufferMemory
+from langchain_community.chat_message_histories import ChatMessageHistory
 
 from langchain_community.vectorstores import Chroma
 from langchain_google_genai import GoogleGenerativeAIEmbeddings
@@ -11,8 +11,9 @@ from langchain_google_genai import ChatGoogleGenerativeAI
 
 from langchain_community.document_loaders import PyPDFLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
-from langchain.chains.combine_documents import create_stuff_documents_chain
-from langchain.chains import create_retrieval_chain
+from langchain_chains.combine_documents import create_stuff_documents_chain
+from langchain_chains import create_retrieval_chain
+
 
 
 # ---------------------------
