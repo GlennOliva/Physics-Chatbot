@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 # Start Ollama server in background
 ollama serve &
@@ -7,4 +7,4 @@ ollama serve &
 sleep 5
 
 # Start your Streamlit app
-streamlit run /app/app.py --server.address=0.0.0.0 --server.port=8501
+streamlit run /app/emne.py --server.address=0.0.0.0 --server.port=8501
