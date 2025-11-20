@@ -1,22 +1,23 @@
 # Base image
 FROM ollama/ollama:latest
 
-# Install Python (Alpine Linux uses apk, not apt)
-RUN apk add --no-cache python3 py3-pip
+# Install Python (Debian uses apt, not apk)
+RUN apt update && \
+    apt install -y python3 python3-pip && \
+    pip3 install --upgrade pip
 
 # Create app directory
 WORKDIR /app
 
-# Copy your project files
+# Copy files
 COPY emne.py /app/
 COPY style.css /app/
 COPY phybook10.pdf /app/
 COPY requirements.txt /app/
 COPY vectorDB /app/vectorDB
 
-# Install python dependencies
-RUN pip3 install --upgrade pip --break-system-packages
-RUN pip3 install -r requirements.txt --break-system-packages
+# Install Python dependencies
+RUN pip3 install -r requirements.txt
 
 # Pull your Ollama model
 RUN ollama pull llama3.1
