@@ -1,6 +1,6 @@
-streamlit
-langchain
-langchain_community
+langchain==0.2.10
+langchain_community==0.2.5
+langchain_text_splitters==0.2.2
 chromadb
 pydantic-settings
-asyncio
+streamlit
