@@ -9,19 +9,12 @@ from langchain_community.vectorstores import Chroma
 from langchain_google_genai import GoogleGenerativeAIEmbeddings
 from langchain_google_genai import ChatGoogleGenerativeAI
 
-# CORRECT for langchain 0.1.20
-from langchain_core.runnables import RunnableWithMessageHistory
-
 from langchain_core.messages import HumanMessage, AIMessage
 
 from langchain_community.document_loaders import PyPDFLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain.chains.combine_documents import create_stuff_documents_chain
 from langchain.chains import create_retrieval_chain
-
-
-
-
 
 
 # ---------------------------
@@ -34,21 +27,22 @@ os.makedirs("vectorDB", exist_ok=True)
 # ---------------------------
 # API Key
 # ---------------------------
-GEMINI_API_KEY = st.secrets["GEMINI_API_KEY"]   # ⭐ Fix: "st.secrets" must be dict key only
+GEMINI_API_KEY = st.secrets["GEMINI_API_KEY"]
 
 
 # ---------------------------
 # Session state
 # ---------------------------
 if "chat_history" not in st.session_state:
-    st.session_state.chat_history = []      # For UI only
+    st.session_state.chat_history = []
 
-# ⭐ Added — tracks LLM conversation memory separately
 if "message_history" not in st.session_state:
     st.session_state.message_history = ChatMessageHistory()
 
 
-
+# ---------------------------
+# Prompt template
+# ---------------------------
 if "prompt" not in st.session_state:
     template = """
 You are a physics assistant that answers strictly from the textbook PDF.
@@ -59,7 +53,7 @@ If the user asks something NOT inside the textbook, reply:
 Context (from textbook):
 {context}
 
-Conversation history:
+Previous conversation:
 {history}
 
 User: {question}
@@ -71,36 +65,33 @@ Assistant:
     )
 
 
-
 # ---------------------------
-# Load PDF + Vector Store
+# Load PDF + Vectorstore
 # ---------------------------
 fixed_pdf_path = "phybook10.pdf"
 
 if "vectorstore" not in st.session_state:
-
     loader = PyPDFLoader(fixed_pdf_path)
     documents = loader.load()
 
     splitter = RecursiveCharacterTextSplitter(
         chunk_size=1000,
-        chunk_overlap=50,
+        chunk_overlap=50
     )
     chunks = splitter.split_documents(documents)
 
-    embedding_model = GoogleGenerativeAIEmbeddings(
+    embeddings = GoogleGenerativeAIEmbeddings(
         model="models/embedding-001",
         google_api_key=GEMINI_API_KEY
     )
 
     st.session_state.vectorstore = Chroma.from_documents(
         documents=chunks,
-        embedding=embedding_model,
+        embedding=embeddings,
         persist_directory="vectorDB"
     )
 
     st.session_state.vectorstore.persist()
-
 
 
 # ---------------------------
@@ -112,9 +103,8 @@ st.session_state.retriever = st.session_state.vectorstore.as_retriever(
 )
 
 
-
 # ---------------------------
-# LLM (Gemini)
+# LLM
 # ---------------------------
 if "llm" not in st.session_state:
     st.session_state.llm = ChatGoogleGenerativeAI(
@@ -124,36 +114,42 @@ if "llm" not in st.session_state:
     )
 
 
-
 # ---------------------------
-# Retrieval Chain
+# Retrieval chain (no RunnableWithMessageHistory)
 # ---------------------------
 if "qa_chain" not in st.session_state:
     document_chain = create_stuff_documents_chain(
         st.session_state.llm,
         st.session_state.prompt
     )
-
     st.session_state.qa_chain = create_retrieval_chain(
         st.session_state.retriever,
         document_chain
     )
 
 
-
 # ---------------------------
-# ⭐ Build memory-powered chain
+# Build custom memory wrapper
 # ---------------------------
-def get_session_history(session_id: str):
-    return st.session_state.message_history
+def run_with_memory(user_input):
 
-memory_chain = RunnableWithMessageHistory(
-    st.session_state.qa_chain,
-    get_session_history,
-    input_messages_key="input",        # ⭐ Very important
-    history_messages_key="history"     # ⭐ Matches prompt variable
-)
+    # Convert message history to string for prompt
+    history_text = "\n".join(
+        f"User: {m.content}" if isinstance(m, HumanMessage)
+        else f"Assistant: {m.content}"
+        for m in st.session_state.message_history.messages
+    )
 
+    result = st.session_state.qa_chain.invoke({
+        "question": user_input,
+        "history": history_text
+    })
+
+    # update memory
+    st.session_state.message_history.add_user_message(user_input)
+    st.session_state.message_history.add_ai_message(result["answer"])
+
+    return result["answer"]
 
 
 # ---------------------------
@@ -164,7 +160,6 @@ st.title("PhyChat – Physics Chatbot (PDF-Based)")
 for msg in st.session_state.chat_history[-5:]:
     with st.chat_message(msg["role"]):
         st.markdown(msg["message"])
-
 
 
 # ---------------------------
@@ -178,16 +173,8 @@ async def get_response(user_input):
 
     with st.chat_message("assistant"):
         with st.spinner("Thinking..."):
+            answer = run_with_memory(user_input)
 
-            # ⭐ Memory-aware chain invoke
-            result = memory_chain.invoke(
-                {"input": user_input},
-                config={"configurable": {"session_id": "abc123"}}   # Can be per-user
-            )
-
-            answer = result["answer"]
-
-        # Typing animation
         placeholder = st.empty()
         full = ""
         for w in answer.split():
@@ -198,7 +185,6 @@ async def get_response(user_input):
         placeholder.markdown(full)
 
     st.session_state.chat_history.append({"role": "assistant", "message": answer})
-
 
 
 # ---------------------------
